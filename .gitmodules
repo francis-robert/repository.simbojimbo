@@ -1,0 +1,3 @@
+[submodule "wizard/plugin.program.simbojimbo"]
+	path = wizard/plugin.program.simbojimbo
+	url = https://github.com/francis-robert/plugin.program.simbojimbo.git
