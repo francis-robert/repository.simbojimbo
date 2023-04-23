@@ -9,6 +9,7 @@ import os
 import shutil
 import sys
 import zipfile
+import argparse
 
 from xml.etree import ElementTree
 
@@ -344,7 +345,7 @@ class Generator:
     def _generate_md5_file(self, addons_xml_path, md5_path):
         """
         Generates a new addons.xml.md5 file.
-        """
+            """
         try:
             with open(addons_xml_path, "r", encoding="utf-8") as f:
                 m = hashlib.md5(f.read().encode("utf-8")).hexdigest()
@@ -374,5 +375,17 @@ class Generator:
 
 
 if __name__ == "__main__":
-    for release in [r for r in KODI_VERSIONS if os.path.exists(r)]:
+    parser = argparse.ArgumentParser(description='Generate zip files and update addons.xml for Kodi addons')
+    parser.add_argument('-p', '--path', help='The path to operate against. Default is the current directory.', default='.')
+    args = parser.parse_args()
+
+    base_path = args.path
+    existing_releases = []
+
+    for release in KODI_VERSIONS:
+        release_path = os.path.join(base_path, release)
+        if os.path.exists(release_path):
+            existing_releases.append(release_path)
+
+    for release in existing_releases:
         Generator(release)
