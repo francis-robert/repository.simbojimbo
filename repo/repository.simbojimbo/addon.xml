@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="repository.simbojimbo" name="SimboJimbo Repository" version="0.0.1"
+<addon id="repository.simbojimbo" name="SimboJimbo Repository" version="0.0.2"
     provider-name="francis-robert">
     <extension point="xbmc.addon.repository" name="SimboJimbo Repository">
         <dir>
             <info compressed="false">
-                https://raw.githubusercontent.com/francis-robert/repository.simbojimbo/main/wizard/repo/zips/addons.xml</info>
+                https://raw.githubusercontent.com/francis-robert/repository.simbojimbo/main/repo/zips/addons.xml</info>
             <checksum>
-                https://raw.githubusercontent.com/francis-robert/repository.simbojimbo/main/wizard/repo/zips/addons.xml.md5</checksum>
+                https://raw.githubusercontent.com/francis-robert/repository.simbojimbo/main/repo/zips/addons.xml.md5</checksum>
             <datadir zip="true">
-                https://raw.githubusercontent.com/francis-robert/repository.simbojimbo/main/wizard/repo/zips/</datadir>
+                https://raw.githubusercontent.com/francis-robert/repository.simbojimbo/main/repo/zips/</datadir>
         </dir>
     </extension>
     <extension point="xbmc.addon.metadata">
         <summary>SimboJimbo Repository</summary>
-        <description>A repository for SimboJimbo's builds and other things</description>
+        <description>A repository for SimboJimbo's addons</description>
         <disclaimer></disclaimer>
         <platform>all</platform>
         <assets>
