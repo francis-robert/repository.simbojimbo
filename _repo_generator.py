@@ -9,7 +9,9 @@ import os
 import shutil
 import sys
 import zipfile
-
+import argparse
+import fnmatch
+import glob
 from xml.etree import ElementTree
 
 SCRIPT_VERSION = 5
@@ -130,6 +132,38 @@ def convert_bytes(num):
             return "%3.1f %s" % (num, x)
         num /= 1024.0
 
+def delete_file(f):
+    try:
+        if os.path.isfile(f):
+            os.remove(f)
+        elif os.path.isdir(f):
+            shutil.rmtree(f)
+        print("Deleted previous content: {}".format(color_text(f, 'red')))
+    except Exception as e:
+        print("Failed to delete previous content: {}\n{}".format(color_text(f, 'yellow'), color_text(e, 'red')))
+
+def update_repo(zips_path):
+    """
+    Copy all zip files matching the pattern 'repository.*.zip' from the zips_path to the current working directory (PWD).
+    """
+    pattern = "repository.*.zip"
+    index_file = "index.html"
+    links = []
+
+    for old_file in glob.glob(os.path.join(os.getcwd(), pattern)):
+        delete_file(old_file)
+
+    for root, dirs, files in os.walk(zips_path): 
+        for filename in fnmatch.filter(files, pattern):
+            file_path = os.path.join(root, filename)
+            shutil.copy(file_path, os.path.join(os.getcwd(), filename))
+            print("Copied {} to the current working directory.".format(color_text(filename, 'yellow')))
+            links.append('<a href="{}">{}</a>'.format(filename, filename))
+    # Update the index.html file
+    with open(index_file, "w") as f:
+        f.write("<!DOCTYPE html>\n")
+        f.write("\n".join(links))
+    print("Updated {} with new links".format(color_text(index_file, 'yellow')))
 
 class Generator:
     """
@@ -195,6 +229,14 @@ class Generator:
                                 color_text(compiled, 'red')
                             )
                         )
+    
+    def _clear_zips(self, zips_path):
+        """
+        Delete the previous contents of the zips folder.
+        """
+        files = glob.glob(os.path.join(zips_path, "*"))
+        for f in files:
+            delete_file(f)
 
     def _create_zip(self, folder, addon_id, version):
         """
@@ -204,6 +246,8 @@ class Generator:
         zip_folder = os.path.join(self.zips_path, addon_id)
         if not os.path.exists(zip_folder):
             os.makedirs(zip_folder)
+        else:
+            self._clear_zips(zip_folder)
 
         final_zip = os.path.join(zip_folder, "{0}-{1}.zip".format(addon_id, version))
         if not os.path.exists(final_zip):
@@ -344,7 +388,7 @@ class Generator:
     def _generate_md5_file(self, addons_xml_path, md5_path):
         """
         Generates a new addons.xml.md5 file.
-        """
+            """
         try:
             with open(addons_xml_path, "r", encoding="utf-8") as f:
                 m = hashlib.md5(f.read().encode("utf-8")).hexdigest()
@@ -374,5 +418,22 @@ class Generator:
 
 
 if __name__ == "__main__":
-    for release in [r for r in KODI_VERSIONS if os.path.exists(r)]:
+    parser = argparse.ArgumentParser(description='Generate zip files and update addons.xml for Kodi addons')
+    parser.add_argument('-p', '--path', help='The path to operate against. Default is the current directory.', default='.')
+    args = parser.parse_args()
+
+    base_path = args.path
+    existing_releases = []
+    
+    
+    for release in KODI_VERSIONS:
+        release_path = os.path.join(base_path, release)
+        if os.path.exists(release_path):
+            existing_releases.append(release_path)
+
+    for release in existing_releases:
+        zips_path = os.path.join(release, 'zips')
+        delete_file(zips_path)
         Generator(release)
+        update_repo(zips_path)
+    
