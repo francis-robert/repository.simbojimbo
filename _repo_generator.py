@@ -1,21 +1,17 @@
-""" 
+"""
     Put this script in the root folder of your repo and it will
     zip up all addon folders, create a new zip in your zips folder
     and then update the md5 and addons.xml file
 """
 
-import hashlib
 import os
 import shutil
-import sys
+import hashlib
 import zipfile
-import argparse
-import fnmatch
-import glob
 from xml.etree import ElementTree
 
-SCRIPT_VERSION = 5
-KODI_VERSIONS = ["krypton", "leia", "matrix", "nexus", "repo"]
+SCRIPT_VERSION = 2
+KODI_VERSIONS = ["krypton", "leia", "matrix", "repo"]
 IGNORE = [
     ".git",
     ".github",
@@ -25,6 +21,19 @@ IGNORE = [
     ".idea",
     "venv",
 ]
+
+
+def _setup_colors():
+    color = os.system("color")
+    console = 0
+    if os.name == 'nt':  # Only if we are running on Windows
+        from ctypes import windll
+
+        k = windll.kernel32
+        console = k.SetConsoleMode(k.GetStdHandle(-11), 7)
+    return color == 1 or console == 1
+
+
 _COLOR_ESCAPE = "\x1b[{}m"
 _COLORS = {
     "black": "30",
@@ -37,81 +46,10 @@ _COLORS = {
     "grey": "37",
     "endc": "0",
 }
-
-
-def _setup_colors():
-    """
-    Return True if the running system's terminal supports color,
-    and False otherwise.
-    """
-
-    def vt_codes_enabled_in_windows_registry():
-        """
-        Check the Windows registry to see if VT code handling has been enabled by default.
-        """
-        try:
-            import winreg
-        except:
-            return False
-        else:
-            reg_key = winreg.OpenKey(
-                winreg.HKEY_CURRENT_USER, "Console", access=winreg.KEY_ALL_ACCESS
-            )
-            try:
-                reg_key_value, _ = winreg.QueryValueEx(reg_key, "VirtualTerminalLevel")
-            except FileNotFoundError:
-                try:
-                    winreg.SetValueEx(
-                        reg_key, "VirtualTerminalLevel", 0, winreg.KEY_DWORD, 1
-                    )
-                except:
-                    return False
-                else:
-                    reg_key_value, _ = winreg.QueryValueEx(
-                        reg_key, "VirtualTerminalLevel"
-                    )
-            else:
-                return reg_key_value == 1
-
-    def is_a_tty():
-        return hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
-
-    def legacy_support():
-        console = 0
-        color = 0
-        if sys.platform in ["linux", "linux2", "darwin"]:
-            pass
-        elif sys.platform == "win32":
-            color = os.system("color")
-
-            from ctypes import windll
-
-            k = windll.kernel32
-            console = k.SetConsoleMode(k.GetStdHandle(-11), 7)
-
-        return any([color == 1, console == 1])
-
-    return any(
-        [
-            is_a_tty(),
-            sys.platform != "win32",
-            "ANSICON" in os.environ,
-            "WT_SESSION" in os.environ,
-            os.environ.get("TERM_PROGRAM") == "vscode",
-            vt_codes_enabled_in_windows_registry(),
-            legacy_support(),
-        ]
-    )
-
-
 _SUPPORTS_COLOR = _setup_colors()
 
 
 def color_text(text, color):
-    """
-    Return an ANSI-colored string, if supported.
-    """
-
     return (
         '{}{}{}'.format(
             _COLOR_ESCAPE.format(_COLORS[color]),
@@ -132,38 +70,6 @@ def convert_bytes(num):
             return "%3.1f %s" % (num, x)
         num /= 1024.0
 
-def delete_file(f):
-    try:
-        if os.path.isfile(f):
-            os.remove(f)
-        elif os.path.isdir(f):
-            shutil.rmtree(f)
-        print("Deleted previous content: {}".format(color_text(f, 'red')))
-    except Exception as e:
-        print("Failed to delete previous content: {}\n{}".format(color_text(f, 'yellow'), color_text(e, 'red')))
-
-def update_repo(zips_path):
-    """
-    Copy all zip files matching the pattern 'repository.*.zip' from the zips_path to the current working directory (PWD).
-    """
-    pattern = "repository.*.zip"
-    index_file = "index.html"
-    links = []
-
-    for old_file in glob.glob(os.path.join(os.getcwd(), pattern)):
-        delete_file(old_file)
-
-    for root, dirs, files in os.walk(zips_path): 
-        for filename in fnmatch.filter(files, pattern):
-            file_path = os.path.join(root, filename)
-            shutil.copy(file_path, os.path.join(os.getcwd(), filename))
-            print("Copied {} to the current working directory.".format(color_text(filename, 'yellow')))
-            links.append('<a href="{}">{}</a>'.format(filename, filename))
-    # Update the index.html file
-    with open(index_file, "w") as f:
-        f.write("<!DOCTYPE html>\n")
-        f.write("\n".join(links))
-    print("Updated {} with new links".format(color_text(index_file, 'yellow')))
 
 class Generator:
     """
@@ -229,14 +135,6 @@ class Generator:
                                 color_text(compiled, 'red')
                             )
                         )
-    
-    def _clear_zips(self, zips_path):
-        """
-        Delete the previous contents of the zips folder.
-        """
-        files = glob.glob(os.path.join(zips_path, "*"))
-        for f in files:
-            delete_file(f)
 
     def _create_zip(self, folder, addon_id, version):
         """
@@ -246,8 +144,6 @@ class Generator:
         zip_folder = os.path.join(self.zips_path, addon_id)
         if not os.path.exists(zip_folder):
             os.makedirs(zip_folder)
-        else:
-            self._clear_zips(zip_folder)
 
         final_zip = os.path.join(zip_folder, "{0}-{1}.zip".format(addon_id, version))
         if not os.path.exists(final_zip):
@@ -366,7 +262,7 @@ class Generator:
             except Exception as e:
                 print(
                     "Excluding {}: {}".format(
-                        color_text(addon, 'yellow'), color_text(e, 'red')
+                        color_text(id, 'yellow'), color_text(e, 'red')
                     )
                 )
 
@@ -388,11 +284,12 @@ class Generator:
     def _generate_md5_file(self, addons_xml_path, md5_path):
         """
         Generates a new addons.xml.md5 file.
-            """
+        """
         try:
-            with open(addons_xml_path, "r", encoding="utf-8") as f:
-                m = hashlib.md5(f.read().encode("utf-8")).hexdigest()
-                self._save_file(m, file=md5_path)
+            m = hashlib.md5(
+                open(addons_xml_path, "r", encoding="utf-8").read().encode("utf-8")
+            ).hexdigest()
+            self._save_file(m, file=md5_path)
 
             return True
         except Exception as e:
@@ -407,8 +304,7 @@ class Generator:
         Saves a file.
         """
         try:
-            with open(file, "w") as f:
-                f.write(data)
+            open(file, "w").write(data)
         except Exception as e:
             print(
                 "An error occurred saving {}!\n{}".format(
@@ -418,22 +314,5 @@ class Generator:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Generate zip files and update addons.xml for Kodi addons')
-    parser.add_argument('-p', '--path', help='The path to operate against. Default is the current directory.', default='.')
-    args = parser.parse_args()
-
-    base_path = args.path
-    existing_releases = []
-    
-    
-    for release in KODI_VERSIONS:
-        release_path = os.path.join(base_path, release)
-        if os.path.exists(release_path):
-            existing_releases.append(release_path)
-
-    for release in existing_releases:
-        zips_path = os.path.join(release, 'zips')
-        delete_file(zips_path)
+    for release in [r for r in KODI_VERSIONS if os.path.exists(r)]:
         Generator(release)
-        update_repo(zips_path)
-    
