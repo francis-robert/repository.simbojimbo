@@ -1,0 +1,3 @@
+[submodule "repo/xbmcbackup"]
+	path = repo/xbmcbackup
+	url = https://github.com/francis-robert/xbmcbackup.git
