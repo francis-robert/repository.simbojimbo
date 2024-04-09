@@ -24,14 +24,19 @@ IGNORE = [
 
 
 def _setup_colors():
-    color = os.system("color")
-    console = 0
-    if os.name == 'nt':  # Only if we are running on Windows
-        from ctypes import windll
+    if os.name == "nt":  # Windows
+        try:
+            from ctypes import windll
 
-        k = windll.kernel32
-        console = k.SetConsoleMode(k.GetStdHandle(-11), 7)
-    return color == 1 or console == 1
+            k = windll.kernel32
+            console = k.SetConsoleMode(k.GetStdHandle(-11), 7)
+            return console == 1
+        except Exception as e:
+            print("Error setting up colors for Windows:", e)
+            return False
+    else:
+        # On non-Windows systems, we assume color support
+        return True
 
 
 _COLOR_ESCAPE = "\x1b[{}m"
@@ -50,22 +55,19 @@ _SUPPORTS_COLOR = _setup_colors()
 
 
 def color_text(text, color):
-    return (
-        '{}{}{}'.format(
-            _COLOR_ESCAPE.format(_COLORS[color]),
-            text,
-            _COLOR_ESCAPE.format(_COLORS["endc"]),
-        )
-        if _SUPPORTS_COLOR
-        else text
-    )
+    if _SUPPORTS_COLOR:
+        color_code = _COLORS.get(color, "0")
+        print(color_code)
+        return f"{_COLOR_ESCAPE.format(color_code)}{text}{_COLOR_ESCAPE.format(_COLORS['endc'])}"
+    else:
+        return text
 
 
 def convert_bytes(num):
     """
     this function will convert bytes to MB.... GB... etc
     """
-    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+    for x in ["bytes", "KB", "MB", "GB", "TB"]:
         if num < 1024.0:
             return "%3.1f %s" % (num, x)
         num /= 1024.0
@@ -91,11 +93,11 @@ class Generator:
 
         if self._generate_addons_file(addons_xml_path):
             print(
-                "Successfully updated {}".format(color_text(addons_xml_path, 'yellow'))
+                "Successfully updated {}".format(color_text(addons_xml_path, "yellow"))
             )
 
             if self._generate_md5_file(addons_xml_path, md5_path):
-                print("Successfully updated {}".format(color_text(md5_path, 'yellow')))
+                print("Successfully updated {}".format(color_text(md5_path, "yellow")))
 
     def _remove_binaries(self):
         """
@@ -110,13 +112,13 @@ class Generator:
                         os.remove(compiled)
                         print(
                             "Removed compiled python file: {}".format(
-                                color_text(compiled, 'green')
+                                color_text(compiled, "green")
                             )
                         )
                     except:
                         print(
                             "Failed to remove compiled python file: {}".format(
-                                color_text(compiled, 'red')
+                                color_text(compiled, "red")
                             )
                         )
             for dir in dirnames:
@@ -126,13 +128,13 @@ class Generator:
                         shutil.rmtree(compiled)
                         print(
                             "Removed __pycache__ cache folder: {}".format(
-                                color_text(compiled, 'green')
+                                color_text(compiled, "green")
                             )
                         )
                     except:
                         print(
                             "Failed to remove __pycache__ cache folder:  {}".format(
-                                color_text(compiled, 'red')
+                                color_text(compiled, "red")
                             )
                         )
 
@@ -176,9 +178,9 @@ class Generator:
             size = convert_bytes(os.path.getsize(final_zip))
             print(
                 "Zip created for {} ({}) - {}".format(
-                    color_text(addon_id, 'cyan'),
-                    color_text(version, 'green'),
-                    color_text(size, 'yellow'),
+                    color_text(addon_id, "cyan"),
+                    color_text(version, "green"),
+                    color_text(size, "yellow"),
                 )
             )
 
@@ -217,7 +219,7 @@ class Generator:
         Generates a zip for each found addon, and updates the addons.xml file accordingly.
         """
         if not os.path.exists(addons_xml_path):
-            addons_root = ElementTree.Element('addons')
+            addons_root = ElementTree.Element("addons")
             addons_xml = ElementTree.ElementTree(addons_root)
         else:
             addons_xml = ElementTree.parse(addons_xml_path)
@@ -239,13 +241,13 @@ class Generator:
                 addon_xml_path = os.path.join(self.release_path, addon, "addon.xml")
                 addon_xml = ElementTree.parse(addon_xml_path)
                 addon_root = addon_xml.getroot()
-                id = addon_root.get('id')
-                version = addon_root.get('version')
+                id = addon_root.get("id")
+                version = addon_root.get("version")
 
                 updated = False
                 addon_entry = addons_root.find(addon_xpath.format(id))
-                if addon_entry is not None and addon_entry.get('version') != version:
-                    index = addons_root.findall('addon').index(addon_entry)
+                if addon_entry is not None and addon_entry.get("version") != version:
+                    index = addons_root.findall("addon").index(addon_entry)
                     addons_root.remove(addon_entry)
                     addons_root.insert(index, addon_root)
                     updated = True
@@ -262,12 +264,12 @@ class Generator:
             except Exception as e:
                 print(
                     "Excluding {}: {}".format(
-                        color_text(id, 'yellow'), color_text(e, 'red')
+                        color_text(id, "yellow"), color_text(e, "red")
                     )
                 )
 
         if changed:
-            addons_root[:] = sorted(addons_root, key=lambda addon: addon.get('id'))
+            addons_root[:] = sorted(addons_root, key=lambda addon: addon.get("id"))
             try:
                 addons_xml.write(
                     addons_xml_path, encoding="utf-8", xml_declaration=True
@@ -277,7 +279,7 @@ class Generator:
             except Exception as e:
                 print(
                     "An error occurred updating {}!\n{}".format(
-                        color_text(addons_xml_path, 'yellow'), color_text(e, 'red')
+                        color_text(addons_xml_path, "yellow"), color_text(e, "red")
                     )
                 )
 
@@ -295,7 +297,7 @@ class Generator:
         except Exception as e:
             print(
                 "An error occurred updating {}!\n{}".format(
-                    color_text(md5_path, 'yellow'), color_text(e, 'red')
+                    color_text(md5_path, "yellow"), color_text(e, "red")
                 )
             )
 
@@ -308,7 +310,7 @@ class Generator:
         except Exception as e:
             print(
                 "An error occurred saving {}!\n{}".format(
-                    color_text(file, 'yellow'), color_text(e, 'red')
+                    color_text(file, "yellow"), color_text(e, "red")
                 )
             )
 
