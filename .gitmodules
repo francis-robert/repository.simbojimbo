@@ -1,3 +1,6 @@
 [submodule "repo/plugin.service.catftp.server"]
 	path = repo/plugin.service.catftp.server
 	url = https://github.com/florence-wolfe/plugin.service.catftp.server.git
+[submodule "repo/plugin.program.catbackup"]
+	path = repo/plugin.program.catbackup
+	url = https://github.com/florence-wolfe/plugin.program.catbackup.git
