@@ -4,3 +4,6 @@
 [submodule "repo/plugin.program.catbackup"]
 	path = repo/plugin.program.catbackup
 	url = https://github.com/florence-wolfe/plugin.program.catbackup.git
+[submodule "repo/script.module.pyftpdlib"]
+	path = repo/script.module.pyftpdlib
+	url = https://github.com/florence-wolfe/script.module.pyftpdlib.git

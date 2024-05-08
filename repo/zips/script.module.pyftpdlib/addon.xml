@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.module.pyftpdlib" name="pyftpdlib" version="1.5.9" provider-name="Giampaolo Rodola">
+  <requires>
+    <import addon="xbmc.python" version="3.0.1"/>
+  </requires>
+  <extension point="xbmc.python.module" library="resources/modules">
+    <summary lang="en_GB">Extremely fast and scalable Python FTP server library.</summary>
+    <description lang="en_GB">Extremely fast and scalable Python FTP server library.</description>
+    <license>MIT</license>
+    <platform>all</platform>
+    <website>https://pyftpdlib.readthedocs.io/</website>
+    <source>https://github.com/giampaolo/pyftpdlib</source>
+    <assets>
+      <icon>resources/icon.png</icon>
+    </assets>
+  </extension>
+</addon>

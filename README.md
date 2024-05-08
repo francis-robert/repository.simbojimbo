@@ -5,3 +5,6 @@ Heavily inspired by repositories by great folks such as jurialmunkey, drinfernoo
 Available add-ons:
 
 #add-ons
+
+- [plugin.program.catbackup](https://github.com/florence-wolfe/plugin.program.catbackup)
+- [plugin.service.catftp.server](https://github.com/florence-wolfe/plugin.service.catftp.server)
