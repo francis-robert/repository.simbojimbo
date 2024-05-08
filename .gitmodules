@@ -22,3 +22,6 @@
 [submodule "repo/script.module.sniffio"]
 	path = repo/script.module.sniffio
 	url = https://github.com/florence-wolfe/script.module.sniffio.git
+[submodule "repo/plugin.service.catsubs"]
+	path = repo/plugin.service.catsubs
+	url = https://github.com/florence-wolfe/plugin.service.catsubs.git

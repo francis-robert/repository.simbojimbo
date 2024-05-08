@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.module.h11" name="h11" version="0.14.0" provider-name="python-hyper">
+  <requires>
+    <import addon="xbmc.python" version="3.0.1"/>
+  </requires>
+  <extension point="xbmc.python.module" library="resources/modules">
+    <summary lang="en_GB">A pure-Python, bring-your-own-I/O implementation of HTTP/1.1</summary>
+    <description lang="en_GB">A pure-Python, bring-your-own-I/O implementation of HTTP/1.1</description>
+    <license>MIT</license>
+    <platform>all</platform>
+    <website>https://h11.readthedocs.io/</website>
+    <source>https://github.com/python-hyper/h11</source>
+  </extension>
+</addon>

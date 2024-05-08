@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.module.httpx" name="httpx" version="0.27.0" provider-name="encode">
+  <requires>
+    <import addon="xbmc.python" version="3.0.1"/>
+    <import addon="script.module.httpcore" version="1.0.5"/>
+    <import addon="script.module.anyio" version="4.3.0"/>
+  </requires>
+  <extension point="xbmc.python.module" library="resources/modules">
+    <summary lang="en_GB">A next generation HTTP client for Python. 🦋</summary>
+    <description lang="en_GB">A next generation HTTP client for Python. 🦋</description>
+    <license>MIT</license>
+    <platform>all</platform>
+    <website>https://www.python-httpx.org/</website>
+    <source>https://github.com/encode/httpx</source>
+    <assets>
+      <icon>resources/icon.png</icon>
+    </assets>
+  </extension>
+</addon>
