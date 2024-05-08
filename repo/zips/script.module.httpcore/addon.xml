@@ -3,7 +3,7 @@
   <requires>
     <import addon="xbmc.python" version="3.0.1"/>
     <import addon="script.module.anyio" version="4.3.0"/>
-    <import addon="script.module.certifi" version="2024.2.2"/>
+    <import addon="script.module.certifi" version="2023.5.7"/>
     <import addon="script.module.h11" version="0.14.0"/>
   </requires>
   <extension point="xbmc.python.module" library="resources/modules">
