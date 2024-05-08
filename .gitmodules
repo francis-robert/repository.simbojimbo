@@ -7,3 +7,18 @@
 [submodule "repo/script.module.pyftpdlib"]
 	path = repo/script.module.pyftpdlib
 	url = https://github.com/florence-wolfe/script.module.pyftpdlib.git
+[submodule "repo/script.module.anyio"]
+	path = repo/script.module.anyio
+	url = https://github.com/florence-wolfe/script.module.anyio.git
+[submodule "repo/script.module.h11"]
+	path = repo/script.module.h11
+	url = https://github.com/florence-wolfe/script.module.h11.git
+[submodule "repo/script.module.httpcore"]
+	path = repo/script.module.httpcore
+	url = https://github.com/florence-wolfe/script.module.httpcore.git
+[submodule "repo/script.module.httpx"]
+	path = repo/script.module.httpx
+	url = https://github.com/florence-wolfe/script.module.httpx.git
+[submodule "repo/script.module.sniffio"]
+	path = repo/script.module.sniffio
+	url = https://github.com/florence-wolfe/script.module.sniffio.git
