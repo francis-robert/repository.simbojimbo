@@ -32,7 +32,7 @@
             directly to Dropbox cloud storage. Backups can be run on demand or via a scheduler.
         </description>
     </extension>
-</addon><addon id="plugin.service.catftp.server" name="CatFTP Server" version="0.0.1~alpha2" provider-name="Florence Wolfe">
+</addon><addon id="plugin.service.catftp.server" name="CatFTP Server" version="0.0.1~alpha3" provider-name="Florence Wolfe">
   <requires>
     <import addon="xbmc.python" version="3.0.1" />
     <import addon="script.module.pyftpdlib" version="1.5.9" />
